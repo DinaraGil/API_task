@@ -100,6 +100,7 @@ class InputBox:
 
 
 box = InputBox(150, 400, 140, 32)
+scale = 10
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -114,7 +115,7 @@ while running:
             if event.key == pygame.K_DOWN:
                 lat = str(float(lat) - 1.0996 * float(scale))
             if event.key == pygame.K_PAGEDOWN:
-                if (scale - 5) > 0:
+                if (scale - 5) >= 0 :
                     scale -= 5
             if event.key == pygame.K_PAGEUP:
                 if (scale + 5) < 45:
@@ -131,7 +132,7 @@ while running:
         box.update()
         params = {
             "ll": ",".join([lon, lat]),
-            "spn": ",".join([scale, scale]),
+            "spn": ",".join([str(scale), str(scale)]),
             "l": l
         }
         response = requests.get(api_server, params=params)
