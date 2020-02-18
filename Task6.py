@@ -3,7 +3,9 @@ import os
 import sys
 import pygame
 import requests
-
+# красная кнопка -- это карта
+# зелёная кнопка -- это со спутника
+# синяя кнопка -- это смешанное
 
 response = None
 pygame.init()
@@ -17,11 +19,13 @@ l = 'map'
 
 running = True
 screen = pygame.display.set_mode((600, 450))
+l_color_inactive = (20, 200, 50)
+l_color_active = (255, 0, 0)
 
 
 class InputBox:
-    COLOR_INACTIVE = pygame.Color('lightskyblue3')
-    COLOR_ACTIVE = pygame.Color('dodgerblue2')
+    COLOR_INACTIVE = (20, 200, 50)
+    COLOR_ACTIVE = (255, 0, 0)
     FONT = pygame.font.Font(None, 32)
 
     def __init__(self, x, y, w, h, text=''):
@@ -56,6 +60,10 @@ class InputBox:
                     if response:
                         # Преобразуем ответ в json-объект
                         json_response = response.json()
+                        if len(json_response["response"]["GeoObjectCollection"]["featureMember"]) == 0:
+                            print(f'По запросу "{self.text}" ничего не найдено')
+                            self.text = ''
+                            return
 
                         # Получаем первый топоним из ответа геокодера.
                         # Согласно описанию ответа, он находится по следующему пути:
@@ -142,9 +150,23 @@ while running:
         if [lon, lat] == pos_found:
             pygame.draw.circle(screen, (255, 0, 0), [300, 205], 10, 7)
             pygame.draw.polygon(screen, (255, 0, 0), [(292, 210), (300, 225), (308, 210)])
-        pygame.draw.rect(screen, (255, 0, 0), (20, 400, 30, 30))
-        pygame.draw.rect(screen, (0, 255, 0), (65, 400, 30, 30))
-        pygame.draw.rect(screen, (0, 0, 255), (110, 400, 30, 30))
+        pygame.draw.rect(screen, l_color_active if l == 'map' else l_color_inactive, (20, 400, 30, 30))
+        pygame.draw.rect(screen, (208, 232, 183), (22, 402, 26, 26))
+        pygame.draw.rect(screen, (253, 250, 242), (28, 402, 14, 26))
+        pygame.draw.rect(screen, (255, 220, 159), (31, 402, 7, 26))
+        pygame.draw.rect(screen, (255, 240, 180), (32, 402, 5, 26))
+
+        pygame.draw.rect(screen, l_color_active if l == 'sat' else l_color_inactive, (65, 400, 30, 30))
+        pygame.draw.rect(screen, (58, 81, 55), (67, 402, 26, 26))
+        pygame.draw.rect(screen, (69, 131, 82), (73, 402, 14, 26))
+        pygame.draw.rect(screen, (168, 169, 161), (76, 402, 7, 26))
+        pygame.draw.rect(screen, (124, 123, 119), (77, 402, 5, 26))
+
+        pygame.draw.rect(screen, l_color_active if l == 'sat,skl' else l_color_inactive, (110, 400, 30, 30))
+        pygame.draw.rect(screen, (58, 81, 55), (112, 402, 26, 26))
+        pygame.draw.rect(screen, (69, 131, 82), (118, 402, 14, 26))
+        pygame.draw.rect(screen, (253, 250, 242), (121, 402, 7, 26))
+        pygame.draw.rect(screen, (247, 204, 142), (122, 402, 5, 26))
     pygame.display.flip()
 pygame.quit()
 
